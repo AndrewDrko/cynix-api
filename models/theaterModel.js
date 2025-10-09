@@ -12,10 +12,6 @@ const theaterSchema = new mongoose.Schema({
     required: [true, 'A theater must have an address'],
     unique: true,
   },
-  numScreens: {
-    type: Number,
-    required: [true, 'A theater must have numScreens'],
-  },
 });
 
 const Theater = mongoose.model('Theater', theaterSchema);

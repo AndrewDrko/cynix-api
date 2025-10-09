@@ -8,4 +8,10 @@ router
   .get(theaterController.getAllTheaters)
   .post(theaterController.createTheater);
 
+router
+  .route('/:id')
+  .get(theaterController.getTheater)
+  .patch(theaterController.updateTheater)
+  .delete(theaterController.deleteTheater);
+
 module.exports = router;
