@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: 'https://cynix-api.onrender.com',
+    origin: 'https://cynix-frontend-lime.vercel.app',
     credentials: true,
   }),
 );
