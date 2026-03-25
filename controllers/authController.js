@@ -16,8 +16,8 @@ const createSendToken = (user, statusCode, res) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
     httpOnly: true,
-    secure: false, // debe ser false en localhost
-    sameSite: 'lax', // permite cross-origin desde tu frontend
+    secure: true, // debe ser false en localhost
+    sameSite: 'none', // permite cross-origin desde tu frontend
   };
 
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
