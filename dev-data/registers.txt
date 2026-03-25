@@ -1,0 +1,75 @@
+[
+  {
+    "title": "Interstellar",
+    "genre": "Ciencia Ficción",
+    "duration": 169,
+    "rating": 4.5,
+    "synopsis": "Un grupo de exploradores viaja a través de un agujero de gusano en busca de un nuevo hogar para la humanidad, enfrentando desafíos extremos y dilemas emocionales que ponen a prueba su humanidad.",
+    "posterUrl": "/uploads/movies/interstellar_poster.webp",
+    "bannerUrl": "/uploads/movies/interstellar_banner.jpeg",
+    "trailerUrl": "https://www.youtube.com/watch?v=5mAbnQQiPD8",
+    "classification": "B15",
+    "actors": ["Matthew McConaughey", "Anne Hathaway", "Jessica Chastain"]
+  },
+  {
+    "title": "The Warning: Live in Auditorio Nacional",
+    "genre": "Concierto / Pop-Rock",
+    "duration": 120,
+    "rating": 4.3,
+    "synopsis": "La banda mexicana The Warning presenta un electrizante concierto en el Auditorio Nacional, mostrando su talento en vivo con un setlist que combina sus éxitos y nuevas composiciones, dejando al público emocionado y cautivado.",
+    "posterUrl": "/uploads/movies/the_warning_poster.webp",
+    "bannerUrl": "/uploads/movies/the_warning_banner.webp",
+    "trailerUrl": "https://www.youtube.com/watch?v=IIWo0tvHUPw",
+    "classification": "A",
+    "actors": ["Daniela Villarreal", "Paulina Villarreal", "Alejandra Villarreal"]
+  },
+  {
+    "title": "Inception",
+    "genre": "Ciencia Ficción / Thriller",
+    "duration": 148,
+    "rating": 4.7,
+    "synopsis": "Un ladrón especializado en robar secretos del subconsciente debe realizar el imposible: implantar una idea en la mente de un objetivo mientras enfrenta mundos oníricos y su propia culpa.",
+    "posterUrl": "/uploads/movies/inception_poster.jpg",
+    "bannerUrl": "/uploads/movies/inception_banner.jpeg",
+    "trailerUrl": "https://www.youtube.com/watch?v=BZOMKZ0AwC8",
+    "classification": "B15",
+    "actors": ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"]
+  },
+  {
+    "title": "Avengers: Endgame",
+    "genre": "Acción / Superhéroes",
+    "duration": 181,
+    "rating": 4.7,
+    "synopsis": "Después de la devastación causada por Thanos, los héroes restantes luchan por revertir el daño y salvar al universo, enfrentando sacrificios personales y decisiones que cambiarán sus vidas para siempre.",
+    "posterUrl": "/uploads/movies/avengers_poster.jpg",
+    "bannerUrl": "/uploads/movies/avengers_banner.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=kWdQOjtDAJA",
+    "classification": "B",
+    "actors": ["Robert Downey Jr.", "Chris Evans", "Scarlett Johansson"]
+  },
+  {
+    "title": "Titanic",
+    "genre": "Romance / Drama",
+    "duration": 195,
+    "rating": 4.6,
+    "synopsis": "Durante el trágico hundimiento del Titanic, un joven artista y una mujer de alta sociedad viven un romance prohibido que desafía las diferencias de clase y la inminente tragedia.",
+    "posterUrl": "/uploads/movies/titanic_poster.jpg",
+    "bannerUrl": "/uploads/movies/titanic_banner.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=tbj0r6EHbLQ",
+    "classification": "B",
+    "actors": ["Leonardo DiCaprio", "Kate Winslet", "Billy Zane"]
+  },
+   {
+    "title": "Whiplash: música y obsesión",
+    "genre": "Drama / Cine independiente / Música",
+    "duration": 107,
+    "rating": 4.8,
+    "synopsis": "Andrew Neiman es un joven y ambicioso baterista de jazz. Marcado por el fracaso de la carrera literaria de su padre, está obsesionado con alcanzar la cima dentro del elitista conservatorio de música de la Costa Este en el que estudia.",
+    "posterUrl": "/uploads/movies/whiplash-musica-obsesion_poster.jpg",
+    "bannerUrl": "/uploads/movies/whiplash-musica-obsesion_banner.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=tbj0r6EHbLQ",
+    "classification": "B",
+    "actors": ["Miles Teller", "J. K. Simmons", "Paul Reiser"],
+    "directors": "Damien Chazelle"
+  }
+]

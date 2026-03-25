@@ -17,17 +17,29 @@ const movieSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A movie must have a duration'],
     },
-    ratingsAverage: {
+    year: {
+      type: Number,
+      required: [true, 'A movie must have a year'],
+    },
+    directors: [String],
+    rating: {
       type: Number,
       min: [1, 'Rating must be above 1.0'],
       max: [5, 'Rating must be below 5.0'],
       required: [true, 'A movie must have ratingsAverage'],
       default: 0,
     },
-    ratingsQuantity: { type: Number, default: 0 },
+    classification: {
+      type: String,
+      required: [true, 'A movie must have a classification'],
+    },
+    actors: [String],
     synopsis: {
       type: String,
       trim: true,
+    },
+    bannerUrl: {
+      type: String,
     },
     posterUrl: {
       type: String,

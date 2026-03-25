@@ -7,7 +7,6 @@ const screenSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'A screen must have a name'],
-    unique: true,
     trim: true,
   },
   capacity: {

@@ -1,9 +1,23 @@
 const Movie = require('../models/movieModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.getAllMovies = catchAsync(async (req, res, next) => {
-  const allMovies = await Movie.find();
+  const features = new APIFeatures(
+    Movie.find().select(
+      '_id title duration classification genre posterUrl bannerUrl rating',
+    ),
+    {
+      ...req.query,
+    },
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+
+  const allMovies = await features.query;
 
   if (!allMovies) {
     return next(new AppError('No movies were found'));
@@ -55,7 +69,7 @@ exports.deleteMovie = catchAsync(async (req, res, next) => {
 });
 
 exports.updateMovie = catchAsync(async (req, res, next) => {
-  const movie = await Theater.findByIdAndUpdate(req.params.id, req.body, {
+  const movie = await Movie.findByIdAndUpdate(req.params.id, req.body, {
     runValidators: true,
     new: true,
   });
@@ -67,5 +81,36 @@ exports.updateMovie = catchAsync(async (req, res, next) => {
     data: {
       movie,
     },
+  });
+});
+
+exports.getTopMovies = catchAsync(async (req, res, next) => {
+  const topMovies = await Movie.aggregate([
+    {
+      $sort: { rating: -1 },
+    },
+    {
+      $limit: 5,
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        synopsis: 1,
+        posterUrl: 1,
+        bannerUrl: 1,
+        trailerUrl: 1,
+      },
+    },
+  ]);
+
+  if (!topMovies || topMovies.length === 0) {
+    return next(new AppError('No movies found', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    results: topMovies.length,
+    data: topMovies,
   });
 });

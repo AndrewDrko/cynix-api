@@ -1,7 +1,11 @@
+// import { createShowtimes } from './jobs/createShowtimes.js';
 const express = require('express');
-const fs = require('fs');
 const path = require('path');
 const app = express();
+const cors = require('cors');
+const cron = require('node-cron');
+const cookieParser = require('cookie-parser');
+
 const theaterRouter = require('./routes/theaterRoutes');
 const screenRouter = require('./routes/screenRoutes');
 const movieRouter = require('./routes/movieRoutes');
@@ -11,9 +15,23 @@ const userRouter = require('./routes/userRoutes');
 const ticketRouter = require('./routes/ticketRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+const { updateExpiredShowtimes } = require('./jobs/updateExpiredShowtimes');
+const { deleteObsoleteShowtimes } = require('./jobs/deleteObsoleteShowtimes');
+const { createShowtimes } = require('./jobs/createShowtimes');
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  }),
+);
+
+app.use(cookieParser());
+
+app.use('/uploads', express.static(path.join(__dirname, '/public/uploads')));
 // ROUTES
 app.use('/api/v1/theater', theaterRouter);
 app.use('/api/v1/screen', screenRouter);
@@ -23,72 +41,19 @@ app.use('/api/v1/seat', seatRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/ticket', ticketRouter);
 
-// app.get('/api/v1/video', (req, res) => {
-//   const dirPath = path.join(__dirname, 'public');
-//   const files = fs.readdirSync(dirPath);
+updateExpiredShowtimes();
+deleteObsoleteShowtimes();
+// createShowtimes();
 
-//   let html = '<h1>Videos disponibles</h1><ul>';
-//   files.forEach((f) => {
-//     html += `<li><a href="/api/v1/video/${f}" target="_blank">${f}</a></li>`;
-//   });
-//   html += '</ul>';
+// CRON FOR UPDATE SHOWTIME STATUS
+// PENDING: Update the expired function without UTC format
+cron.schedule('*/30 * * * *', updateExpiredShowtimes);
 
-//   res.send(html);
-// });
+// CRON FOR DELETE OBSOLETE SHOWTIMES
+cron.schedule('0 0 * * *', deleteObsoleteShowtimes);
 
-// app.get('/api/v1/video/:name', (req, res, next) => {
-//   const videoPath = path.join(__dirname, 'public', req.params.name);
-
-//   if (!fs.existsSync(videoPath)) {
-//     return next(new AppError(`Video ${req.params.name} not found`, 404));
-//   }
-
-//   const stat = fs.statSync(videoPath);
-//   const fileSize = stat.size;
-//   const range = req.headers.range;
-
-//   if (range) {
-//     // Ejemplo: "bytes=0-"
-//     const parts = range.replace(/bytes=/, '').split('-');
-//     const start = parseInt(parts[0], 10);
-//     const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-
-//     if (start >= fileSize) {
-//       res.status(416).send('Requested range not satisfiable');
-//       return;
-//     }
-
-//     const chunksize = end - start + 1;
-//     const file = fs.createReadStream(videoPath, { start, end });
-//     const head = {
-//       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-//       'Accept-Ranges': 'bytes',
-//       'Content-Length': chunksize,
-//       'Content-Type': 'video/mp4',
-//     };
-
-//     res.writeHead(206, head);
-//     file.pipe(res);
-//   } else {
-//     const head = {
-//       'Content-Length': fileSize,
-//       'Content-Type': 'video/mp4',
-//     };
-//     res.writeHead(200, head);
-//     fs.createReadStream(videoPath).pipe(res);
-//   }
-// });
-
-// app.get('/api/v1/video/:name', (req, res, next) => {
-//   const videoPath = path.join(__dirname, 'public', req.params.name);
-
-//   // Verificamos si el archivo existe
-//   if (!fs.existsSync(videoPath)) {
-//     return next(new AppError(`Video ${req.params.name} not found`, 404));
-//   }
-
-//   res.type('video/mp4').sendFile(videoPath);
-// });
+// CRON FOR CREATING NEW SHOWTIMES
+cron.schedule('0 0 * * *', createShowtimes);
 
 app.all(/.*/, (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

@@ -2,22 +2,16 @@ const mongoose = require('mongoose');
 const Screen = require('./screenModel');
 const Seat = require('./seatModel');
 const AppError = require('../utils/appError');
-const cron = require('node-cron');
 
 const showtimeSchema = new mongoose.Schema({
   dateTime: {
     type: Date,
     required: [true, 'A showtime must have a dateTime'],
-    unique: true,
   },
-  expirationDate: {
+  // GENERATES AUTHOMATIC
+  endTime: {
     type: Date,
-    validate: {
-      validator: function (val) {
-        return val >= this.dateTime;
-      },
-      message: 'Expiration date must be greater than date time',
-    },
+    // required: true,
   },
   price: {
     type: Number,
@@ -35,56 +29,52 @@ const showtimeSchema = new mongoose.Schema({
     enum: ['active', 'expired'],
     default: 'active',
   },
-  screen: { type: mongoose.Schema.Types.ObjectId, ref: 'Screen' },
-  movie: { type: mongoose.Schema.Types.ObjectId, ref: 'Movie' },
+  screen: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Screen',
+    required: [true, 'A showtime must belong to a screen'],
+  },
+  movie: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Movie',
+    required: [true, 'A showtime must belong to a movie'],
+  },
+  theater: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Theater',
+    required: [true, 'A showtime must belong to a theater'],
+  },
 });
 
-// CRON FOR UPDATE SHOWTIME STATUS
-cron.schedule('*/30 * * * *', async () => {
-  const now = new Date();
+// showtimeSchema.index({ movie: 1, screen: 1, dateTime: 1 }, { unique: true });
 
-  const result = await Showtime.updateMany(
-    { expirationDate: { $lte: now }, status: 'active' },
-    { $set: { status: 'expired' } },
-  );
+showtimeSchema.pre('save', async function (next) {
+  if (!this.isModified('dateTime') && !this.isModified('movie')) return next();
 
-  console.log(
-    `⏰ Showtime statuses updated automatically / CRON in ${now} / ${result.modifiedCount} documents updated`,
-  );
+  const movie = await mongoose.model('Movie').findById(this.movie);
+  if (!movie) return next(new Error('Movie not found'));
+
+  this.endTime = new Date(this.dateTime.getTime() + movie.duration * 60000);
+
+  next();
 });
 
-// CRON FOR DELETE OBSOLETE SHOWTIMES
-cron.schedule('0 0 * * *', async () => {
-  // Se ejecuta todos los días a medianoche
-  const now = new Date();
-
-  // Buscar showtimes expirados hace más de 1 mes
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-  const expiredShowtimes = await Showtime.find({
-    expirationDate: { $lte: oneMonthAgo },
+// VALIDAR TRASLAPES
+showtimeSchema.pre('save', async function (next) {
+  const conflicting = await mongoose.model('Showtime').findOne({
+    screen: this.screen,
+    _id: { $ne: this._id }, // evitar conflicto consigo mismo
+    dateTime: { $lt: this.endTime }, // empieza antes de que esta termine
+    endTime: { $gt: this.dateTime }, // termina después de que esta empieza
   });
 
-  for (const showtime of expiredShowtimes) {
-    await Seat.deleteMany({ showtime: showtime._id });
-
-    await showtime.deleteOne();
-  }
-
-  console.log(`${expiredShowtimes.length} expired showtimes removed at ${now}`);
-});
-
-showtimeSchema.pre('save', function (next) {
-  if (!this.expirationDate && this.dateTime) {
-    const expiration = new Date(this.dateTime);
-    expiration.setHours(expiration.getHours() + 2);
-
-    this.expirationDate = expiration;
-  }
-
-  if (this.expirationDate <= this.dateTime) {
-    return next(new Error('Expiration date must be greater than date time'));
+  if (conflicting) {
+    return next(
+      new AppError(
+        'This showtime overlaps with another existing showtime',
+        400,
+      ),
+    );
   }
 
   next();
@@ -92,6 +82,8 @@ showtimeSchema.pre('save', function (next) {
 
 showtimeSchema.pre('save', async function (next) {
   try {
+    if (!this.isNew) return next();
+
     const screen = await Screen.findById(this.screen);
 
     if (!screen) {
@@ -117,6 +109,14 @@ showtimeSchema.pre('save', async function (next) {
   } catch (error) {
     next(error);
   }
+});
+
+showtimeSchema.pre('findOneAndDelete', async function (next) {
+  const showtime = await this.model.findOne(this.getFilter());
+  if (!showtime) return next();
+
+  await Seat.deleteMany({ showtime: showtime._id });
+  next();
 });
 
 const Showtime = mongoose.model('Showtime', showtimeSchema);

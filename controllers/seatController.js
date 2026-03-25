@@ -1,4 +1,5 @@
 const Seat = require('../models/seatModel');
+const Showtime = require('../models/showtimeModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
@@ -33,6 +34,27 @@ exports.getSeat = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       seat,
+    },
+  });
+});
+
+exports.getSeatsByShowtime = catchAsync(async (req, res, next) => {
+  const seats = await Seat.find({ showtime: req.params.showtimeId });
+
+  if (!seats)
+    return next(new AppError('No seats founded for that showtime ID', 404));
+
+  const showtime = await Showtime.findById(req.params.showtimeId)
+    .populate('movie')
+    .populate('screen', '_id name type')
+    .populate('theater', 'name address');
+
+  res.status(200).json({
+    status: 'success',
+    numSeats: seats.length,
+    data: {
+      showtime,
+      seats,
     },
   });
 });

@@ -3,6 +3,8 @@ const movieController = require('../controllers/movieController');
 
 const router = express.Router();
 
+router.route('/top-5-movies').get(movieController.getTopMovies);
+
 router
   .route('/')
   .get(movieController.getAllMovies)
