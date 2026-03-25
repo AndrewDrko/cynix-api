@@ -71,7 +71,7 @@ exports.logout = catchAsync(async (req, res, next) => {
   res.clearCookie('jwt', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'none',
   });
   res.status(200).json({ message: 'Session logged out' });
 });
