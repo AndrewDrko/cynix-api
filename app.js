@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: 'https://cynix-frontend-lime.vercel.app',
+    origin: `${process.env.NODE_ENV === 'production' ? 'https://cynix-frontend-lime.vercel.app' : 'http://localhost:5173'}`,
     credentials: true,
   }),
 );

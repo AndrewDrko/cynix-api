@@ -16,8 +16,8 @@ const createSendToken = (user, statusCode, res) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
     httpOnly: true,
-    secure: true, // debe ser false en localhost
-    sameSite: 'none', // permite cross-origin desde tu frontend
+    secure: `${!process.env.NODE_ENV === 'development'}`, // debe ser false en localhost
+    sameSite: `${process.env.NODE_ENV === 'development' ? 'lax' : 'none'}`,
   };
 
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
@@ -71,7 +71,7 @@ exports.logout = catchAsync(async (req, res, next) => {
   res.clearCookie('jwt', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
+    sameSite: `${process.env.NODE_ENV === 'development' ? 'lax' : 'none'}`,
   });
   res.status(200).json({ message: 'Session logged out' });
 });
